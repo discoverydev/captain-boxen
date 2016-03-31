@@ -32,7 +32,7 @@ File {
 
 Package {
   provider => homebrew,
-  require  => Class['homebrew']
+  require  => Class['homebrew'],
   install_options => ['--appdir=/Applications', '--force']
 }
 
@@ -61,15 +61,40 @@ node default {
   include nginx
   include brewcask
 
+  file { "${boxen::config::srcdir}/our-boxen":
+    ensure => link,
+    target => $boxen::config::repodir
+  }
+
   #
   # node stuff 
   # 
   nodejs::version { 'v0.12.2': }
   class { 'nodejs::global': version => 'v0.12.2' }
-  nodejs::module { 'npm': node_version => 'v0.12.2' }
-  nodejs::module { 'appium@1.4.13': node_version => 'v0.12.2' }
-  nodejs::module { 'ios-sim': node_version => 'v0.12.2' }
-  nodejs::module { 'phantomjs': node_version => 'v0.12.2' }
+  npm_module { "npm": 
+    module       => 'npm',
+    node_version => $version
+  }
+
+  npm_module { 'appium':
+    module       => 'appium@1.4.13',
+    version      => '~> 1.4.13',
+    node_version => $version
+  }
+
+  npm_module { 'ios-sim':
+    module       => 'ios-sim',
+    node_version => $version
+  }
+
+  npm_module { 'phantomjs': 
+    module       => 'phantomjs',
+    node_version => $version
+  }
+  #nodejs::module { 'npm': node_version => 'v0.12.2' }
+  #nodejs::module { 'appium@1.4.13': node_version => 'v0.12.2' }
+  #nodejs::module { 'ios-sim': node_version => 'v0.12.2' }
+  #nodejs::module { 'phantomjs': node_version => 'v0.12.2' }
 
   #
   # ruby stuff
